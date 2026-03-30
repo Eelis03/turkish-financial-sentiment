@@ -1,6 +1,5 @@
 from transformers import pipeline
-from src.keywords import BULLISH_KEYWORDS, BEARISH_KEYWORDS
-from src.stock_matcher import hisse_bul
+from src.keywords import classify_headline
 
 
 class FinancialAnalyzer:
@@ -8,53 +7,39 @@ class FinancialAnalyzer:
     def __init__(self, model_adi: str = "Eelis/turkish-financial-bert-v2"):
         self.model = pipeline("text-classification", model=model_adi)
 
-    def _anahtar_kelime_skoru(self, metin: str) -> str | None:
-        """
-        Metinde bullish/bearish anahtar kelime var mı kontrol et.
-        Model kararını desteklemek için kullanılır.
-        """
-        metin_lower = metin.lower()
-        bullish_skor = sum(1 for k in BULLISH_KEYWORDS if k in metin_lower)
-        bearish_skor = sum(1 for k in BEARISH_KEYWORDS if k in metin_lower)
-
-        if bullish_skor > bearish_skor:
-            return "bullish"
-        elif bearish_skor > bullish_skor:
-            return "bearish"
-        return None
-
     def analiz_et(self, metin: str) -> dict:
-        """
-        Metni analiz et — model + anahtar kelime hibrit.
-        """
         # Model tahmini
         tahmin = self.model(metin)[0]
         model_etiketi = tahmin["label"]
         model_guveni = round(tahmin["score"], 2)
 
-        # Anahtar kelime kontrolü
-        keyword_etiketi = self._anahtar_kelime_skoru(metin)
+        # Kural bazlı sistem
+        kural_sonuc = classify_headline(metin)
+        kural_etiketi = kural_sonuc["label"]
+        kural_guveni = kural_sonuc["confidence"]
 
         # Hibrit karar
-        # Model güveni düşükse anahtar kelimeye bak
-        if model_guveni < 0.75 and keyword_etiketi:
-            final_etiket = keyword_etiketi
-            kaynak = "keyword"
-        else:
+        # Model güveni yüksekse modele güven
+        # Düşükse kural sistemine bak
+        if model_guveni >= 0.85:
             final_etiket = model_etiketi
             kaynak = "model"
-
-        # Hisse tespiti
-        hisseler = hisse_bul(metin)
+        elif kural_guveni >= 0.70:
+            final_etiket = kural_etiketi
+            kaynak = "kural"
+        else:
+            # İkisi de emin değilse neutral
+            final_etiket = "neutral"
+            kaynak = "fallback"
 
         return {
             "metin": metin,
             "etiket": final_etiket,
             "guven": model_guveni,
             "karar_kaynagi": kaynak,
-            "hisseler": hisseler,
+            "hisseler": kural_sonuc["stocks"],
             "model_etiketi": model_etiketi,
-            "keyword_etiketi": keyword_etiketi,
+            "kural_etiketi": kural_etiketi,
         }
 
     def toplu_analiz(self, metinler: list[str]) -> list[dict]:
@@ -65,16 +50,18 @@ if __name__ == "__main__":
     analyzer = FinancialAnalyzer()
 
     metinler = [
-        "Türk Hava Yolları büyük zarar açıkladı",
-        "Garanti Bankası ve Akbank hisseleri yükseldi",
-        "Borsa İstanbul güne yatay başladı",
-        "Tüpraş rekor kar açıkladı",
-        "THYAO hisseleri sert düştü",
+        "Koç'tan savaş tedbiri: TÜPRAŞ'ta dev hisse satışı",
+        "THYAO hisseleri rekor kırdı",
+        "Akbank güçlü bilanço açıkladı",
+        "Merkez Bankası faiz kararını açıkladı",
+        "BIST100 endeksi güne düşük hacimle başladı",
+        "Garanti Bankası karını artırdı",
+        "EREGL hisseleri taban yaptı",
     ]
 
     for metin in metinler:
         sonuc = analyzer.analiz_et(metin)
         emoji = "🟢" if sonuc["etiket"] == "bullish" else "🔴" if sonuc["etiket"] == "bearish" else "⚪"
-        print(f"{emoji} [{sonuc['etiket'].upper()}] ({sonuc['guven']}) — {sonuc['karar_kaynagi']}")
+        print(f"{emoji} [{sonuc['etiket'].upper()}] model:{sonuc['model_etiketi']} kural:{sonuc['kural_etiketi']} kaynak:{sonuc['karar_kaynagi']}")
         print(f"   Hisseler: {sonuc['hisseler']}")
         print(f"   {metin}\n")
