@@ -11,6 +11,16 @@
 
 ---
 
+## 🚀 Canlı Demo / Live Demo
+
+**Web Arayüzü:** [huggingface.co/spaces/Eelis/turkish-financial-sentiment](https://huggingface.co/spaces/Eelis/turkish-financial-sentiment)
+
+**HuggingFace Model:** [huggingface.co/Eelis/turkish-financial-bert-v2](https://huggingface.co/Eelis/turkish-financial-bert-v2)
+
+**GitHub:** [github.com/Eelis03/turkish-financial-sentiment](https://github.com/Eelis03/turkish-financial-sentiment)
+
+---
+
 ## 🎯 Problem
 
 Türkçe finansal NLP alanında etiketli veri ve fine-tune edilmiş model neredeyse yok. İngilizce'de FinBERT gibi güçlü modeller mevcut, ancak Türkçe piyasa haberleri için bu boşluk doldurulamıyor.
@@ -96,11 +106,11 @@ Bağlam kuralları ekstra puan verir:
 ### Serving Pipeline
 
 ```
-FastAPI → Docker → AWS EC2
+FastAPI REST API
        ↓
-REST API (coming soon)
+Gradio Web Arayüzü
        ↓
-Gradio Web UI (coming soon)
+HuggingFace Spaces (canlı)
 ```
 
 ---
@@ -115,7 +125,28 @@ cd turkish-financial-sentiment
 pip install -r requirements.txt
 ```
 
-### Kullanım / Usage
+### .env dosyası oluştur
+
+```
+NEWS_API_KEY=your_newsapi_key
+HF_TOKEN=your_huggingface_token
+```
+
+### Web arayüzünü başlat
+
+```bash
+python app.py
+```
+
+### API'yi başlat
+
+```bash
+uvicorn src.api:app --reload --port 8000
+```
+
+API dokümantasyonu: `http://localhost:8000/docs`
+
+### Model ile kullanım
 
 ```python
 from transformers import pipeline
@@ -125,21 +156,9 @@ classifier = pipeline(
     model="Eelis/turkish-financial-bert-v2"
 )
 
-# Tek cümle
 result = classifier("Borsa İstanbul bugün sert yükseldi")
 print(result)
 # [{'label': 'bullish', 'score': 0.99}]
-
-# Toplu tahmin
-headlines = [
-    "THYAO hisseleri rekor kırdı",
-    "Garanti Bankası büyük zarar açıkladı",
-    "Merkez Bankası faiz kararını açıkladı"
-]
-
-for headline in headlines:
-    result = classifier(headline)
-    print(f"{headline} → {result[0]['label']} ({result[0]['score']:.2f})")
 ```
 
 ### Hibrit sistem ile kullanım
@@ -159,6 +178,20 @@ print(result)
 #   'model_etiketi': 'bearish',
 #   'kural_etiketi': 'bearish'
 # }
+```
+
+### FastAPI endpoint'leri
+
+```bash
+# Tekil analiz
+curl -X POST "http://localhost:8000/analiz" \
+  -H "Content-Type: application/json" \
+  -d '{"metin": "THYAO hisseleri rekor kırdı"}'
+
+# Toplu analiz
+curl -X POST "http://localhost:8000/toplu-analiz" \
+  -H "Content-Type: application/json" \
+  -d '{"metinler": ["THYAO rekor kırdı", "GARAN zarar açıkladı"]}'
 ```
 
 ### Örnek Çıktı / Example Output
@@ -192,6 +225,26 @@ print(result)
 | 🔴 bearish | Olumsuz piyasa sinyali | Negative market signal |
 | ⚪ neutral | Nötr haber | No clear market signal |
 
+### Desteklenen Hisseler / Supported Stocks
+
+| Ticker | Şirket |
+|--------|--------|
+| THYAO | Türk Hava Yolları |
+| GARAN | Garanti BBVA |
+| AKBNK | Akbank |
+| EREGL | Ereğli Demir Çelik |
+| BIMAS | BİM |
+| KCHOL | Koç Holding |
+| SISE | Şişecam |
+| TUPRS | Tüpraş |
+| YKBNK | Yapı Kredi |
+| ASELS | Aselsan |
+| EKGYO | Emlak Konut |
+| FROTO | Ford Otosan |
+| TOASO | Tofaş |
+| PGSUS | Pegasus |
+| SAHOL | Sabancı Holding |
+
 ---
 
 ## 🗂️ Proje Yapısı / Project Structure
@@ -199,21 +252,24 @@ print(result)
 ```
 turkish-financial-sentiment/
 │
-├── data/
-│   └── raw/                  # Ham ve işlenmiş veriler
+├── app.py                    # Gradio web arayüzü
+├── main.py                   # Ana uygulama (CLI)
+├── requirements.txt
 │
 ├── src/
-│   ├── collector.py          # NewsAPI haber toplama
+│   ├── api.py                # FastAPI endpoints
 │   ├── analyzer.py           # Hibrit analiz sistemi
+│   ├── collector.py          # NewsAPI haber toplama
 │   ├── stock_matcher.py      # Hisse adı tespiti
 │   └── keywords.py           # Regex pattern sistemi
+│
+├── data/
+│   └── raw/                  # Ham ve işlenmiş veriler
 │
 ├── notebooks/
 │   └── 01_canli_test.ipynb   # Canlı haber testi
 │
-├── main.py                   # Ana uygulama
-├── .env                      # API anahtarları (git'e gitmez)
-└── requirements.txt
+└── .env                      # API anahtarları (git'e gitmez)
 ```
 
 ---
@@ -223,12 +279,14 @@ turkish-financial-sentiment/
 - **Python 3.10**
 - **HuggingFace Transformers** — Model fine-tuning ve inference
 - **PyTorch** — Deep learning framework
+- **FastAPI** — REST API
+- **Gradio** — Web arayüzü
 - **Pandas** — Veri işleme
 - **Kaggle GPU** — Model eğitimi (T4 x2)
 - **Regex** — Kural tabanlı pattern sistemi
-- **FastAPI** — REST API *(coming soon)*
+- **HuggingFace Spaces** — Cloud deployment
 - **Docker** — Containerization *(coming soon)*
-- **AWS EC2** — Cloud deployment *(coming soon)*
+- **AWS EC2** — Production deployment *(coming soon)*
 
 ---
 
@@ -241,11 +299,11 @@ turkish-financial-sentiment/
 - [x] Regex tabanlı kural sistemi
 - [x] Hisse adı tespiti (THYAO, GARAN, AKBNK...)
 - [x] Hibrit analiz sistemi (BERT + Regex)
-- [ ] FastAPI ile REST API
-- [ ] Gradio web arayüzü
+- [x] FastAPI ile REST API
+- [x] Gradio web arayüzü
+- [x] HuggingFace Spaces deploy
 - [ ] Docker containerization
 - [ ] AWS EC2 deployment
-- [ ] Gerçek zamanlı haber akışı (NewsAPI + RSS)
 - [ ] MLflow experiment tracking
 
 ---
@@ -255,7 +313,7 @@ turkish-financial-sentiment/
 - KAP (Kamuyu Aydınlatma Platformu) bildirimlerini gerçek fiyat hareketleriyle eşleştirerek daha güçlü bir dataset oluşturmak
 - Hisse bazlı sentiment skoru takibi
 - Kripto para haberleri için genişletme
-- REST API ve web arayüzü ile production'a taşımak
+- Production deployment (Docker + AWS)
 
 ---
 
