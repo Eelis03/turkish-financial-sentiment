@@ -5,22 +5,103 @@ from typing import Dict, List, Tuple, Any
 # STOCK / COMPANY NAME MAP
 # ============================================================
 
-STOCK_NAMES: Dict[str, List[str]] = {
-    "THYAO": ["Türk Hava Yolları", "THY", "THYAO"],
+STOCK_NAMES = {
+    # =========================
+    # BIST / INDEX
+    # =========================
+    "BIST": [
+        "BIST", "Borsa İstanbul", "Borsa Istanbul",
+        "BIST100", "BIST 100", "BIST-100",
+        "XU100", "XU 100",
+        "BIST30", "BIST 30", "BIST-30",
+        "BIST50", "BIST 50",
+        "endeks", "piyasa", "piyasalar"
+    ],
+
+    # =========================
+    # BANKALAR
+    # =========================
     "GARAN": ["Garanti", "Garanti Bankası", "GARAN", "Garanti BBVA"],
     "AKBNK": ["Akbank", "AKBNK"],
-    "EREGL": ["Ereğli", "Erdemir", "EREGL"],
-    "BIMAS": ["BİM", "BIMAS", "Bim"],
-    "KCHOL": ["Koç Holding", "Koç", "KCHOL"],
-    "SISE": ["Şişecam", "SISE", "Sisecam"],
-    "TUPRS": ["Tüpraş", "TUPRS", "Tupras"],
     "YKBNK": ["Yapı Kredi", "YKBNK", "Yapi Kredi"],
-    "ASELS": ["Aselsan", "ASELS"],
-    "EKGYO": ["Emlak Konut", "EKGYO"],
+    "ISCTR": ["İş Bankası", "Is Bankasi", "ISCTR"],
+    "HALKB": ["Halkbank", "HALKB"],
+    "VAKBN": ["Vakıfbank", "Vakifbank", "VAKBN"],
+    "TSKB": ["TSKB"],
+    "ALBRK": ["Albaraka", "ALBRK"],
+
+    # =========================
+    # HOLDING
+    # =========================
+    "KCHOL": ["Koç Holding", "Koç", "KCHOL"],
+    "SAHOL": ["Sabancı Holding", "Sabancı", "SAHOL", "Sabanci Holding", "Sabanci"],
+    "SISE": ["Şişecam", "SISE", "Sisecam"],
+    "DOHOL": ["Doğan Holding", "Doğan Holding", "DOHOL"],
+
+    # =========================
+    # SANAYİ / ENERJİ
+    # =========================
+    "TUPRS": ["Tüpraş", "TUPRS", "Tupras"],
+    "EREGL": ["Ereğli", "Erdemir", "EREGL"],
+    "PETKM": ["Petkim", "PETKM"],
+    "SASA": ["SASA"],
+    "KRDMD": ["Kardemir", "KRDMD"],
+    "ODAS": ["Odaş", "ODAS"],
+    "AKSEN": ["Aksa Enerji", "AKSEN"],
+    "ENJSA": ["Enerjisa", "ENJSA"],
+    "ZOREN": ["Zorlu Enerji", "ZOREN"],
+
+    # =========================
+    # HAVACILIK / ULAŞIM
+    # =========================
+    "THYAO": ["Türk Hava Yolları", "THY", "THYAO"],
+    "PGSUS": ["Pegasus", "PGSUS"],
+    "TAVHL": ["TAV Havalimanları", "TAVHL"],
+
+    # =========================
+    # OTOMOTİV
+    # =========================
     "FROTO": ["Ford Otosan", "FROTO"],
     "TOASO": ["Tofaş", "TOASO", "Tofas"],
-    "PGSUS": ["Pegasus", "PGSUS"],
-    "SAHOL": ["Sabancı Holding", "Sabancı", "SAHOL", "Sabanci Holding", "Sabanci"],
+    "DOAS": ["Doğuş Otomotiv", "DOAS"],
+
+    # =========================
+    # PERAKENDE
+    # =========================
+    "BIMAS": ["BİM", "BIMAS", "Bim"],
+    "MGROS": ["Migros", "MGROS"],
+    "SOKM": ["Şok Marketler", "SOKM"],
+    "A101": ["A101"],
+
+    # =========================
+    # SAVUNMA
+    # =========================
+    "ASELS": ["Aselsan", "ASELS"],
+    "TURSG": ["Türkiye Sigorta", "TURSG"],
+
+    # =========================
+    # GAYRİMENKUL
+    # =========================
+    "EKGYO": ["Emlak Konut", "EKGYO"],
+    "TRGYO": ["Torunlar GYO", "TRGYO"],
+
+    # =========================
+    # TELEKOM / TEKNOLOJİ
+    # =========================
+    "TCELL": ["Turkcell", "TCELL"],
+    "TTKOM": ["Türk Telekom", "TTKOM"],
+    "LOGO": ["Logo Yazılım", "LOGO"],
+
+    # =========================
+    # DİĞER BÜYÜKLER
+    # =========================
+    "CCOLA": ["Coca Cola İçecek", "CCOLA"],
+    "ULKER": ["Ülker", "ULKER"],
+    "HEKTS": ["Hektaş", "HEKTS"],
+    "KOZAL": ["Koza Altın", "KOZAL"],
+    "KOZAA": ["Koza Anadolu", "KOZAA"],
+    "GUBRF": ["Gübretaş", "GUBRF"],
+    "ARCLK": ["Arçelik", "ARCLK"],
 }
 
 # ============================================================
